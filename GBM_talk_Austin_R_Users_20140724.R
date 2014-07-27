@@ -50,8 +50,8 @@ tP1 <- predict.gbm(object = g,newdata = xTrain,GBM_NTREES)
 hP1 <- predict.gbm(object = g,newdata = xTest,GBM_NTREES)
 
 ## compare model performance to default (overall mean)
-rmse(yTrain,tP1)			##  9452.742 on unseen data
-rmse(yTest,hP1)				##  9740.559 ~3% drop; does not seem to be overfit
+rmse(yTrain,tP1)			##  9452.742 on data used for training
+rmse(yTest,hP1)				##  9740.559 ~3% drop on unseen data; does not seem to be overfit
 rmse(yTest,mean(yTrain))	## 24481.08  overall mean; cut error rate (from perfection) by 60%
 
 ## look at variables
