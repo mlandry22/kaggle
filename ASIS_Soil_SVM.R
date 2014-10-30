@@ -1,5 +1,5 @@
 ## this code borrows the main structure from the forum post regarding beating the benchmark
-## additions to it are mainly: using two layers, updating cost functions, capping low/high values
+## additions to it are mainly: using two layers, updating cost parameters, capping low/high values
 ##  trimming the range for some targets, and using the [incorrectly calculated] derivatives.
 
 library(e1071)
