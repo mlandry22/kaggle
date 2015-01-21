@@ -1,7 +1,7 @@
 Modern Logistic Regression
 ======
 
-This is a separate collection of files that support the talk I gave to the Austin Machine Learning Meetup on 1/19/2015. 
+This is a small collection of files that support the talk I gave to the Austin Machine Learning Meetup on 1/19/2015. 
 
 These scripts are used directly (OK by the amusing license) from Kaggle forums, and provide a fantastic entry point for robust classification tasks.
 
