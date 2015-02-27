@@ -256,35 +256,35 @@ x6<-cbind(x4,diffDf)
 ##	Create Test Data Frame
 ###############################
 
-personList<-c("S01","S03","S04","S05","S08","S09","S10","S15","S19","S25")
+testPersonList<-c("S01","S03","S04","S05","S08","S09","S10","S15","S19","S25")
 sessionList<-c("01","02","03","04","05")
 depthList<-c(60,60,60,60,100)
-for(i in 1:length(personList)){
+for(i in 1:length(testPersonList)){
   for(j in 1:length(sessionList)){
-    if(i*j==1){xAllTest<-prepareFeatures(getOneSec(personList[i],sessionList[j]),depthList[j])}
-    if(i*j>1){xAllTest<-rbind(xAllTest,prepareFeatures(getOneSec(personList[i],sessionList[j]),depthList[j]))}
+    if(i*j==1){xAllTest<-prepareFeatures(getOneSec(testPersonList[i],sessionList[j]),depthList[j])}
+    if(i*j>1){xAllTest<-rbind(xAllTest,prepareFeatures(getOneSec(testPersonList[i],sessionList[j]),depthList[j]))}
     print(dim(xAllTest))
   }
 }
 
 
-for(i in 1:length(personList)){
+for(i in 1:length(testPersonList)){
   for(j in 1:length(sessionList)){
-    fileBase<-paste0("pls/Data_",personList[i],"_Sess",sessionList[j],"_pls.csv")
+    fileBase<-paste0("pls/Data_",testPersonList[i],"_Sess",sessionList[j],"_pls.csv")
     if(i*j==1){plsAllTest<-read.csv(fileBase,header=FALSE)}
     if(i*j>1){plsAllTest<-rbind(plsAllTest,read.csv(fileBase,header=FALSE))}
   }
 }
 
 
-for(i in 1:length(personList)){
+for(i in 1:length(testPersonList)){
   for(j in 1:length(sessionList)){
-	if(i*j==1){xFB<-getFeedBacks(personList[i],sessionList[j],depthList[j])}
-	if(i*j>1){xFB<-c(xFB,getFeedBacks(personList[i],sessionList[j],depthList[j]))}
+	if(i*j==1){xFBTest<-getFeedBacks(testPersonList[i],sessionList[j],depthList[j])}
+	if(i*j>1){xFBTest<-c(xFBTest,getFeedBacks(testPersonList[i],sessionList[j],depthList[j]))}
   }
   print(i)
 }
-xTestFBDiff<-pmax(0,c(0,xFB[2:length(xFB)]-xFB[1:(length(xFB)-1)]))
+xTestFBDiff<-pmax(0,c(0,xFBTest[2:length(xFBTest)]-xFB[1:(length(xFBTest)-1)]))
 xTestFBDiff[xFBDiff==0]<-4500
 xTestFBDiff<-round(xTestFBDiff/50,0)
 
@@ -303,7 +303,7 @@ colnames(x3)<-colnames(x2)[1:ncol(x3)]
 testCuts<-c( 36,   38,39,39,      40,41,42,            44,        47,               51   ) 
 xMagicTest<-rep(0,nrow(x3))
 xSingleMagicTest<-rep(0,nrow(x3))
-adjFbDiffTest<-x3$xxFBDiff
+adjFbDiffTest<-x3$xFBDiff
 
 for(i in 1:10){
   m1<-createMagic(testSess5[(1+(i-1)*100):(i*100)],testCuts[i])
@@ -391,7 +391,6 @@ auc(y,sAll1k)
 fullFit<-fitGbm(x6[,cols],y,"model",1000,0.01,10,10,-1)
 summary(fullFit,plotit=FALSE)[1:30,]
 pFinal<-predict(fullFit,newdata=x7[,cols],n.trees=1000,type="response")
-plot(pFinal[c((1+5*340):(6*340),(1+9*340):3400)])
 plot(pFinal)
 z<-read.csv("SampleSubmission.csv")
 z[,2]<-pFinal
