@@ -195,10 +195,15 @@ delay<-as.factor(as.character(delay))
 x2<-as.data.frame(unlist(sapply(trainAll,function(x) as.numeric(as.character(x)))))
 x2$delay<-delay
 
+trainSess5<-c(0,1600)
+for(i in 1:16){trainSess5[(1+(i-1)*100):(i*100)]<-xFBDiff[(241+(i-1)*340):(i*340)]}
+for(i in 1:length(trainSess5)){if(i%%5==1) trainSess5[i]<-trainSess5[i]-20}
+
 xMagic<-rep(0,nrow(x2))
 xSingleMagic<-rep(0,nrow(x2))
 adjFbDiff<-x2$xxFBDiff
 
+trainCuts<-c(   37,         40,40,         42,42,44,44,   45,46,47,  47,47,48,51,52,   52)
 for(i in 1:16){
   m1<-createMagic(trainSess5[(1+(i-1)*100):(i*100)],trainCuts[i])
   singleMagic<-pmax(5,round(sum(pmax(0,m1)/max(m1))/10,0))
@@ -212,7 +217,7 @@ x2$xSingleMagic<-xSingleMagic
 x2$xxAdjFBDiff<-adjFbDiff
 
 ## fix alignment problem
-x2$xMagic[1:5438]<-x2$xMagic[3:5440]
+x2$xMagic[1:5439]<-x2$xMagic[2:5440]
 
 
 ## add EOG/Cz differences
@@ -245,7 +250,6 @@ x4<-cbind(x2,diff2)
 
 diffDf<-as.data.frame(straightDiffs); colnames(diffDf)<-paste0("diff",colnames(diffDf)); rownames(diffDf)<-NULL
 x6<-cbind(x4,diffDf)
-cols<-c(1:387)
 
 
 ###############################
@@ -257,9 +261,9 @@ sessionList<-c("01","02","03","04","05")
 depthList<-c(60,60,60,60,100)
 for(i in 1:length(personList)){
   for(j in 1:length(sessionList)){
-    if(i*j==1){xAll<-prepareFeatures(getOneSec(personList[i],sessionList[j]),depthList[j])}
-    if(i*j>1){xAll<-rbind(xAll,prepareFeatures(getOneSec(personList[i],sessionList[j]),depthList[j]))}
-    print(dim(xAll))
+    if(i*j==1){xAllTest<-prepareFeatures(getOneSec(personList[i],sessionList[j]),depthList[j])}
+    if(i*j>1){xAllTest<-rbind(xAllTest,prepareFeatures(getOneSec(personList[i],sessionList[j]),depthList[j]))}
+    print(dim(xAllTest))
   }
 }
 
@@ -267,10 +271,11 @@ for(i in 1:length(personList)){
 for(i in 1:length(personList)){
   for(j in 1:length(sessionList)){
     fileBase<-paste0("pls/Data_",personList[i],"_Sess",sessionList[j],"_pls.csv")
-    if(i*j==1){plsAll<-read.csv(fileBase,header=FALSE)}
-    if(i*j>1){plsAll<-rbind(plsAll,read.csv(fileBase,header=FALSE))}
+    if(i*j==1){plsAllTest<-read.csv(fileBase,header=FALSE)}
+    if(i*j>1){plsAllTest<-rbind(plsAllTest,read.csv(fileBase,header=FALSE))}
   }
 }
+
 
 for(i in 1:length(personList)){
   for(j in 1:length(sessionList)){
@@ -279,24 +284,23 @@ for(i in 1:length(personList)){
   }
   print(i)
 }
-xFBDiff<-pmax(0,c(0,xFB[2:length(xFB)]-xFB[1:(length(xFB)-1)]))
-xFBDiff[xFBDiff==0]<-4500
-xFBDiff<-round(xFBDiff/50,0)
+xTestFBDiff<-pmax(0,c(0,xFB[2:length(xFB)]-xFB[1:(length(xFB)-1)]))
+xTestFBDiff[xFBDiff==0]<-4500
+xTestFBDiff<-round(xTestFBDiff/50,0)
 
-testAll<-cbind(xAll,plsAll)
-testAll$xFBDiff<-xFBDiff
+testAll<-cbind(xAllTest,plsAllTest)
+testAll$xTestFBDiff<-xTestFBDiff
 
 ## isolate all session5's for analysis
-trainSess5<-c(0,1600)
-for(i in 1:16){trainSess5[(1+(i-1)*100):(i*100)]<-xFBDiff[(241+(i-1)*340):(i*340)]}
-for(i in 1:length(trainSess5)){if(i%%5==1) trainSess5[i]<-trainSess5[i]-20}
-
+testSess5<-c(0,1000)
+for(i in 1:10){testSess5[(1+(i-1)*100):(i*100)]<-xTestFBDiff[(241+(i-1)*340):(i*340)]}
 
 testAll$spellCheck<-trainAll$spellCheck[1:nrow(testAll)]
 x3<-as.data.frame(unlist(sapply(testAll,function(x) as.numeric(as.character(x)))))
 x3$delay<-x2$delay[1:nrow(x3)]
 colnames(x3)<-colnames(x2)[1:ncol(x3)]
 
+testCuts<-c( 36,   38,39,39,      40,41,42,            44,        47,               51   ) 
 xMagicTest<-rep(0,nrow(x3))
 xSingleMagicTest<-rep(0,nrow(x3))
 adjFbDiffTest<-x3$xxFBDiff
@@ -314,30 +318,30 @@ x3$xSingleMagic<-xSingleMagicTest
 x3$xxAdjFBDiff<-adjFbDiffTest
 
 ## fix alignment problem
-x3$xMagic[1:3398]<-x3$xMagic[3:3400]
+x3$xMagic[1:3399]<-x3$xMagic[2:3400]
 
-maxLoop<-nrow(xAllTest)
-for(i in 1:maxLoop){
-	a<-as.numeric(xAllTest[i,12:190])	##eog
-	b<-as.numeric(x3[i,12:190])	##cz
-	a<-(a-min(a))/(max(a)-min(a))	##eog
-	b<-(b-min(b))/(max(b)-min(b))	##cz
-	diffs<-a-b	##eog-cz
-	scalar<-1-(max(diffs)/100)
-	if(i==1){diff2Test<-t(as.data.frame(b-(a*scalar)))}
-	if(i>1){diff2Test<-rbind(diff2Test,t(as.data.frame(b-(a*scalar))))}	
-}
+  maxLoop<-nrow(x3)
+  for(i in 1:maxLoop){
+  	a<-as.numeric(x3[i,12:190])	##eog
+  	b<-as.numeric(x3[i,12:190])	##cz
+  	a<-(a-min(a))/(max(a)-min(a))	##eog
+  	b<-(b-min(b))/(max(b)-min(b))	##cz
+  	diffs<-a-b	##eog-cz
+  	scalar<-1-(max(diffs)/100)
+  	if(i==1){diff2Test<-t(as.data.frame(b-(a*scalar)))}
+  	if(i>1){diff2Test<-rbind(diff2Test,t(as.data.frame(b-(a*scalar))))}	
+  }
 
-maxLoop<-nrow(xAllTest)
-for(i in 1:maxLoop){
-	a<-as.numeric(xAllTest[i,12:190])	##eog
-	b<-as.numeric(x3[i,12:190])	##cz
-	a<-(a-min(a))/(max(a)-min(a))	##eog
-	b<-(b-min(b))/(max(b)-min(b))	##cz
-	straightDiff<-a-b
-	if(i==1){straightDiffsTest<-t(as.data.frame(straightDiff))}
-	if(i>1){straightDiffsTest<-rbind(straightDiffsTest,t(as.data.frame(straightDiff)))}	
-}
+  maxLoop<-nrow(x3)
+  for(i in 1:maxLoop){
+  	a<-as.numeric(x3[i,12:190])	##eog
+  	b<-as.numeric(x3[i,12:190])	##cz
+  	a<-(a-min(a))/(max(a)-min(a))	##eog
+  	b<-(b-min(b))/(max(b)-min(b))	##cz
+  	straightDiff<-a-b
+  	if(i==1){straightDiffsTest<-t(as.data.frame(straightDiff))}
+  	if(i>1){straightDiffsTest<-rbind(straightDiffsTest,t(as.data.frame(straightDiff)))}	
+  }
 
 x5<-cbind(x3,diff2Test)
 diffDfTest<-as.data.frame(straightDiffsTest); colnames(diffDfTest)<-paste0("diff",colnames(diffDfTest)); rownames(diffDfTest)<-NULL
@@ -345,7 +349,7 @@ x7<-cbind(x5,diffDfTest)
 
 
 #############################################
-##	Test Training by doing 
+##	Test Training by running
 ##	 leave-one-out (LOO) validation
 ##	 but waiting to check AUC against
 ##	 the overall set of points, as
@@ -357,7 +361,8 @@ x7<-cbind(x5,diffDfTest)
 l<-read.csv("TrainLabels.csv")
 y<-l[,2]
 
-cols<-c(1:11,75:88,64:66,120,125:128,132,165,196,199:208,222,258:259,270:278,307:315,387,388:566)
+#cols<-c(1:387)
+cols<-c(1:11,75:88,64:66,120,125:128,132,165,196,199:208,222,258:259,270:278,307:315,387) #,388:566)
 
 s1<-fitGbm(x6[,cols],y,"predictions",100,0.1,10,10,1)
 s2<-fitGbm(x6[,cols],y,"predictions",100,0.1,10,10,2)
@@ -377,6 +382,7 @@ s15<-fitGbm(x6[,cols],y,"predictions",100,0.1,10,10,15)
 s16<-fitGbm(x6[,cols],y,"predictions",100,0.1,10,10,16)
 
 sAll1k<-c(s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16)
+library(Metrics)
 auc(y,sAll1k)
 
 
@@ -388,10 +394,8 @@ summary(fullFit,plotit=FALSE)[1:30,]
 pFinal<-predict(fullFit,newdata=x7[,c(1:11,77:88,132,125:128,64:66,120,165,199:205,402:404)],n.trees=1000,type="response")
 plot(pFinal[c((1+5*340):(6*340),(1+9*340):3400)])
 plot(pFinal)
-submission<-read.csv("SampleSubmission.csv")
-submission[,2]<-pFinal
-submission[(3400-339):3400,2]<-(submission[(3400-339):3400,2]-0.35)
-write.csv(submission,"fixed_xMagic_butDroppedS25anyway.csv",row.names=FALSE,quote=FALSE)
+z<-read.csv("SampleSubmission.csv")
+z[,2]<-pFinal
 
 ################################
 ## Post Processing
@@ -405,7 +409,6 @@ write.csv(submission,"fixed_xMagic_butDroppedS25anyway.csv",row.names=FALSE,quot
 ##  a single subject, based on their 
 ##  rate of abnormal lenghts.
 
-z<-submission
 z[(1+0*340):(1*340),2]<-z[(1+0*340):(1*340),2]-0
 z[(1+1*340):(2*340),2]<-z[(1+1*340):(2*340),2]-0.05
 z[(1+2*340):(3*340),2]<-z[(1+2*340):(3*340),2]-0
@@ -419,7 +422,7 @@ z[(1+9*340):(10*340),2]<-z[(1+9*340):(10*340),2]-0.275
 write.csv(z,"bci_submission.csv",row.names=FALSE,quote=FALSE)
 
 
-## Table of rate of normal lenghts vs GBM mean
+## Table of rate of normal lengths vs GBM mean
 ## 1	0.67	0.64530
 ## 2	0.41	0.64200
 ## 3	0.83	0.69560
