@@ -361,8 +361,7 @@ x7<-cbind(x5,diffDfTest)
 l<-read.csv("TrainLabels.csv")
 y<-l[,2]
 
-#cols<-c(1:387)
-cols<-c(1:11,75:88,64:66,120,125:128,132,165,196,199:208,222,258:259,270:278,307:315,387) #,388:566)
+cols<-c(1:11,77:88,132,125:128,64:66,120,165,199:205,402:404)
 
 s1<-fitGbm(x6[,cols],y,"predictions",100,0.1,10,10,1)
 s2<-fitGbm(x6[,cols],y,"predictions",100,0.1,10,10,2)
@@ -389,9 +388,9 @@ auc(y,sAll1k)
 ##################################
 ##	Generate submission
 ##################################
-fullFit<-fitGbm(x6[,c(1:11,77:88,132,125:128,64:66,120,165,199:205,402:404)],y,"model",1000,0.01,10,10,-1)
+fullFit<-fitGbm(x6[,cols],y,"model",1000,0.01,10,10,-1)
 summary(fullFit,plotit=FALSE)[1:30,]
-pFinal<-predict(fullFit,newdata=x7[,c(1:11,77:88,132,125:128,64:66,120,165,199:205,402:404)],n.trees=1000,type="response")
+pFinal<-predict(fullFit,newdata=x7[,cols],n.trees=1000,type="response")
 plot(pFinal[c((1+5*340):(6*340),(1+9*340):3400)])
 plot(pFinal)
 z<-read.csv("SampleSubmission.csv")
