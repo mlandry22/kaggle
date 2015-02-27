@@ -182,9 +182,9 @@ trainAll<-cbind(xAll,plsAll)
 trainAll$xFBDiff<-xFBDiff
 
 ##count up the zones for spelling
-spellCheck<-c(rep(65,340),rep(93,340),rep(88,340),rep(62,340),rep(60,340),rep(50,340),rep(79,340),rep(63,340),rep(56,340),rep(70,340),
- rep(62,340),rep(88,340),rep(94,340),rep(73,340),rep(68,340),rep(73,340))
-trainAll$spellCheck<-spellCheck
+#spellCheck<-c(rep(65,340),rep(93,340),rep(88,340),rep(62,340),rep(60,340),rep(50,340),rep(79,340),rep(63,340),rep(56,340),rep(70,340),
+# rep(62,340),rep(88,340),rep(94,340),rep(73,340),rep(68,340),rep(73,340))
+trainAll$spellCheck<-rep(0,nrow(trainAll))  #spellCheck
 delay<-rep(0,nrow(trainAll))
 ## attempt to encode not the straight numbers from spellCheck, but a great/good/average/bad speller type encoding
 ##  the intent is to scale to unseen data (test has some really bad ones)
@@ -284,8 +284,8 @@ for(i in 1:length(testPersonList)){
   }
   print(i)
 }
-xTestFBDiff<-pmax(0,c(0,xFBTest[2:length(xFBTest)]-xFB[1:(length(xFBTest)-1)]))
-xTestFBDiff[xFBDiff==0]<-4500
+xTestFBDiff<-pmax(0,c(0,xFBTest[2:length(xFBTest)]-xFBTest[1:(length(xFBTest)-1)]))
+xTestFBDiff[xTestFBDiff==0]<-4500
 xTestFBDiff<-round(xTestFBDiff/50,0)
 
 testAll<-cbind(xAllTest,plsAllTest)
@@ -294,8 +294,9 @@ testAll$xTestFBDiff<-xTestFBDiff
 ## isolate all session5's for analysis
 testSess5<-c(0,1000)
 for(i in 1:10){testSess5[(1+(i-1)*100):(i*100)]<-xTestFBDiff[(241+(i-1)*340):(i*340)]}
+for(i in 1:length(testSess5)){if(i%%5==1) testSess5[i]<-testSess5[i]-20}
 
-testAll$spellCheck<-trainAll$spellCheck[1:nrow(testAll)]
+testAll$spellCheck<-0
 x3<-as.data.frame(unlist(sapply(testAll,function(x) as.numeric(as.character(x)))))
 x3$delay<-x2$delay[1:nrow(x3)]
 colnames(x3)<-colnames(x2)[1:ncol(x3)]
@@ -303,7 +304,7 @@ colnames(x3)<-colnames(x2)[1:ncol(x3)]
 testCuts<-c( 36,   38,39,39,      40,41,42,            44,        47,               51   ) 
 xMagicTest<-rep(0,nrow(x3))
 xSingleMagicTest<-rep(0,nrow(x3))
-adjFbDiffTest<-x3$xFBDiff
+adjFbDiffTest<-x3$xTestFBDiff
 
 for(i in 1:10){
   m1<-createMagic(testSess5[(1+(i-1)*100):(i*100)],testCuts[i])
