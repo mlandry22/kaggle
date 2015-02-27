@@ -201,7 +201,7 @@ for(i in 1:length(trainSess5)){if(i%%5==1) trainSess5[i]<-trainSess5[i]-20}
 
 xMagic<-rep(0,nrow(x2))
 xSingleMagic<-rep(0,nrow(x2))
-adjFbDiff<-x2$xxFBDiff
+adjFbDiff<-x2$xFBDiff
 
 trainCuts<-c(   37,         40,40,         42,42,44,44,   45,46,47,  47,47,48,51,52,   52)
 for(i in 1:16){
