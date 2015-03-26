@@ -8,6 +8,8 @@
 ##  coarse measurements of the same RR1 value used
 ##  in the provided benchmark.
 ##
+## Packages: data.table
+##
 ## Performance: 0.00872817
 ## Relative performance: 37th out of 189; improves upon 
 ## provided benchmark (0.01177621), and using all 1's (0.01017651)
