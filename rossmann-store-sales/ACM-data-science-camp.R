@@ -1,4 +1,3 @@
-setwd("/Users/mark/Documents/rossman/models/")
 library(data.table)  
 library(h2o)
 
