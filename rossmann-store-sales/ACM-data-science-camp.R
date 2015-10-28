@@ -13,7 +13,7 @@ store          ## examples from the store data
 train <- merge(train,store,by="Store")
 train          ## glance at merged data
 
-## Conver date field into a proper date format, then extract month and year
+## Convert date field into a proper date format, then extract month and year
 train[,Date:=as.Date(Date)]
 train[,month:=as.integer(format(Date, "%m"))]
 train[,year:=as.integer(format(Date, "%y"))]
@@ -74,7 +74,7 @@ train[,.(.N,mean(Sales)),Open]   ## data table syntax, SQL style: [i,j,by] = [WH
 ##   In practice, this is fine, as it's an easy and obvious way to separate the data. 
 ##   Nobody will be impressed by our ability to separate Open/Closed stores really well.
 ## But there are two considerations, still. One is that it is so specific, it might be better to separate the data anyway
-##   via a rule-based system. The rationale is that with anything that samples columns, it might try and fit a tree with
+##   via a rule-based system. The rationale is that with anything that samples columns, it might try and fit a tree without
 ##   vital information. And with 17k records at exactly 0 sales, plus the intuitive concept that Closed = 0 sales, there
 ##   should be no advantage leaving that data in. 
 ##   So let's try removing it.
